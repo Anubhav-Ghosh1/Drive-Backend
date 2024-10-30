@@ -6,6 +6,17 @@ import { ApiError } from "../utils/apiError.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/uploadToCloudinary.js";
 
 const uploadNewFile = asyncHandler(async (req, res) => {
+    /*
+        What it does?
+        It takes file as an input and saves it
+
+        Steps:
+        1. Get user id
+        2. Verify User
+        3. Get file path
+        4. Upload File
+        5. Create Entry in Database
+    */
     try {
         const id = req?.user?._id;
         console.log(id)
@@ -25,7 +36,6 @@ const uploadNewFile = asyncHandler(async (req, res) => {
         }
 
         const file = await uploadOnCloudinary(localFilePath);
-        console.log("File",file)
         const createFile = await File.create({
             user: id,
             fileDetails: 
@@ -103,6 +113,16 @@ const uploadNewFile = asyncHandler(async (req, res) => {
 
 const editFileName = asyncHandler(async (req, res) => {
     try {
+        /*
+        What it does?
+        It take file name and updates its value
+
+        Steps:
+        1. Get public_id and name
+        2. Verify is file exists
+        3. Update file
+        4. Validate file
+        */
         const { public_id, name } = req.body;
         console.log(req.body);
 
@@ -112,7 +132,6 @@ const editFileName = asyncHandler(async (req, res) => {
                 .status(400)
                 .json(new ApiError(400, "All fields are required"));
         }
-        console.log("hello");
 
         // Check if file exists
         const fileExist = await File.findOne({ "fileDetails.cloudinary_public_id": public_id }); // Corrected query
@@ -123,7 +142,6 @@ const editFileName = asyncHandler(async (req, res) => {
                 .status(400)
                 .json(new ApiError(400, "File does not exist"));
         }
-        console.log("hi");
 
         // Update file name
         const updatedFile = await File.findByIdAndUpdate(
@@ -162,6 +180,14 @@ const editFileName = asyncHandler(async (req, res) => {
 const deleteFile = asyncHandler(async (req,res) => {
     try
     {
+        /*
+        What it does?
+        It takes public id as an input and deletes it
+
+        Steps:
+        1. Get public id
+        2. Delete image
+        */
         const {public_id} = req.body;
         if(!public_id)
         {
@@ -215,6 +241,10 @@ const searchFilesByName = asyncHandler(async (req, res) => {
 const getFileByUser = asyncHandler(async (req,res) => {
     try
     {
+        /*
+        What it does?
+        It returns all the files by the user
+        */
         const id = req?.user?._id;
         if(!id)
         {
