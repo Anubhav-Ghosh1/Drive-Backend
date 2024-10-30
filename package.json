@@ -1,6 +1,7 @@
 {
   "name": "google-drive",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend Project",
   "main": "src/index.js",
   "scripts": {
