@@ -4,7 +4,6 @@ const router = express.Router();
 import {
     registerUser,
     loginUser,
-    loginUser,
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,

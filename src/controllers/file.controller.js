@@ -3,15 +3,15 @@ import { File } from "../models/file.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
-import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/uploadToCloudinary";
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/uploadToCloudinary.js";
 
 const uploadNewFile = asyncHandler(async (req, res) => {
     try {
-        const id = req?._id;
+        const id = req?.user?._id;
+        console.log(id)
         if (!id) {
             return res.status(400).json(new ApiError(400, "Id is required"));
         }
-
         const user = await User.findById(id);
         if (!user) {
             return res
@@ -25,18 +25,17 @@ const uploadNewFile = asyncHandler(async (req, res) => {
         }
 
         const file = await uploadOnCloudinary(localFilePath);
-
+        console.log("File",file)
         const createFile = await File.create({
             user: id,
-            fileDetails: [
+            fileDetails: 
                 {
                     name: file?.original_filename,
                     url: file?.secure_url,
-                    cloudinary_avatar_public_id: file?.public_id,
+                    cloudinary_public_id: file?.public_id,
                     type: file?.format,
                     size: file?.bytes,
                 },
-            ],
         });
 
         return res
@@ -51,26 +50,86 @@ const uploadNewFile = asyncHandler(async (req, res) => {
     }
 });
 
+// const editFileName = asyncHandler(async (req, res) => {
+//     try {
+//         const { public_id, name } = req.body;
+//         console.log(req.body)
+//         if (!public_id || !name) {
+//             return res
+//                 .status(400)
+//                 .json(new ApiError(400, "All fields are required"));
+//         }
+//         console.log("hello")
+
+//         const fileExist = await File.findOne({ fileDetails.public_id: public_id });
+//         console.log(fileExist)
+//         if (!fileExist) {
+//             return res
+//                 .status(400)
+//                 .json(new ApiError(400, "File does not exist"));
+//         }
+//         console.log("hi")
+//         const updatedFile = await File.findByIdAndUpdate(
+//             fileExist._id,
+//             {
+//                 fileDetails: {name},
+//             },
+//             { new: true }
+//         );
+
+//         if (!updatedFile) {
+//             return res
+//                 .status(400)
+//                 .json(new ApiError(400, "Error while updating file"));
+//         }
+
+//         return res
+//             .status(200)
+//             .json(
+//                 new ApiResponse(
+//                     200,
+//                     updatedFile,
+//                     "File details updated successfully"
+//                 )
+//             );
+//     } catch (e) {
+//         return res
+//             .status(500)
+//             .json(
+//                 new ApiResponse(500, {}, "Error while updating file details")
+//             );
+//     }
+// });
+
 const editFileName = asyncHandler(async (req, res) => {
     try {
         const { public_id, name } = req.body;
+        console.log(req.body);
+
+        // Validate input
         if (!public_id || !name) {
             return res
                 .status(400)
                 .json(new ApiError(400, "All fields are required"));
         }
+        console.log("hello");
 
-        const fileExist = await File.findOne({ public_id });
+        // Check if file exists
+        const fileExist = await File.findOne({ "fileDetails.cloudinary_public_id": public_id }); // Corrected query
+        console.log(fileExist);
+
         if (!fileExist) {
             return res
                 .status(400)
                 .json(new ApiError(400, "File does not exist"));
         }
+        console.log("hi");
 
+        // Update file name
         const updatedFile = await File.findByIdAndUpdate(
             fileExist._id,
             {
-                name,
+               $set: {"fileDetails.name": name}, // Updated syntax for updating nested fields
             },
             { new: true }
         );
@@ -91,6 +150,7 @@ const editFileName = asyncHandler(async (req, res) => {
                 )
             );
     } catch (e) {
+        console.error(e); // Log the error for debugging
         return res
             .status(500)
             .json(
@@ -108,7 +168,7 @@ const deleteFile = asyncHandler(async (req,res) => {
             return res.status(400).json(new ApiError(400,"Id is required"));
         }
 
-        const updatedFile = await File.findOneAndDelete({cloudinary_public_id: public_id});
+        const updatedFile = await File.findOneAndDelete({"fileDetails.cloudinary_public_id": public_id});
         const response = await deleteFromCloudinary(public_id);
         if(!response)
         {
@@ -124,7 +184,7 @@ const deleteFile = asyncHandler(async (req,res) => {
 
 const searchFilesByName = asyncHandler(async (req, res) => {
     try {
-        const userId = req?._id; // Assuming user ID is available from middleware
+        const userId = req?.user?._id; // Assuming user ID is available from middleware
         const { name } = req.query; // Capture the search term from the query string
 
         if (!userId) {
