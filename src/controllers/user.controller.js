@@ -33,20 +33,6 @@ export const registerUser = asyncHandler(async (req, res) => {
             throw new ApiError(400, "All fields are required");
         }
 
-        // Validate location format
-        const locationJson = JSON.parse(req.body.location);
-        if (
-            !locationJson.type ||
-            locationJson.type !== "Point" ||
-            !Array.isArray(locationJson.coordinates) ||
-            locationJson.coordinates.length !== 2
-        ) {
-            throw new ApiError(
-                400,
-                "Invalid location format. Must be a Point with coordinates [longitude, latitude]"
-            );
-        }
-
         // Check if user already exists
         const existedUser = await User.findOne({ email });
 

@@ -12,4 +12,15 @@ import {
     updateUserAvatar,
 } from "../controllers/user.controller.js";
 
-router.get("/register");
+import {verifyJWT} from "../middlewares/auth.middleware.js";
+import {upload} from "../middlewares/multer.middleware.js";
+
+router.post("/register",upload.single("avatar"),registerUser);
+router.post("/login",loginUser);
+router.get("/refreshToken",verifyJWT,refreshAccessToken);
+router.patch("/changePassword",verifyJWT,changeCurrentPassword);
+router.get("/getCurrentUser",verifyJWT,getCurrentUser);
+router.patch("/updateAccountDetails",verifyJWT,updateAccountDetails);
+router.patch("/updateUserAvatar",verifyJWT,upload.single("avatar"),updateUserAvatar);
+
+export default router;
