@@ -1,5 +1,5 @@
 # Backend Project - Google Drive
-
+![Drive-Backend](https://socialify.git.ci/Anubhav-Ghosh1/Drive-Backend/image?forks=1&issues=1&language=1&name=1&owner=1&pulls=1&stargazers=1&theme=Dark)
 This project is a backend application that mimics Google Drive functionality, allowing users to register, upload, manage, and search files. Built using **Node.js**, **Express**, **MongoDB**, and **Cloudinary**, it provides secure file handling with **JWT authentication**.
 
 ## Table of Contents
