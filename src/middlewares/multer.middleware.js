@@ -1,3 +1,4 @@
+// multer.middleware.js
 import multer from "multer";
 
 const storage = multer.diskStorage({
@@ -5,9 +6,17 @@ const storage = multer.diskStorage({
         cb(null, "./public/temp");
     },
     filename: function (req, file, cb) {
-        console.log("File: ",file)
         cb(null, file.originalname);
     },
 });
 
-export const upload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+    // Allow PDFs and images
+    if (file.mimetype === "application/pdf" || file.mimetype.startsWith("image/") || file.mimetype.startsWith("video/")) {
+        cb(null, true);
+    } else {
+        cb(new Error("Unsupported file type. Only PDFs and images are allowed."), false);
+    }
+};
+
+export const upload = multer({ storage, fileFilter });

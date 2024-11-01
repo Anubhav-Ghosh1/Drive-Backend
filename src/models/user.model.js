@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    uniqueId:
+    {
+      type: String,
+    },
     email: {
       type: String,
       required: true,

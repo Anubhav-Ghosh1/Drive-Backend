@@ -4,6 +4,7 @@ const router = express.Router();
 import {
     registerUser,
     loginUser,
+    logoutUser,
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
@@ -16,6 +17,7 @@ import {upload} from "../middlewares/multer.middleware.js";
 
 router.post("/register",upload.single("avatar"),registerUser);
 router.post("/login",loginUser);
+router.post("/logout",verifyJWT,logoutUser);
 router.get("/refreshToken",verifyJWT,refreshAccessToken);
 router.patch("/changePassword",verifyJWT,changeCurrentPassword);
 router.get("/getCurrentUser",verifyJWT,getCurrentUser);

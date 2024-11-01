@@ -3,6 +3,7 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { uploadOnCloudinary } from "../utils/uploadToCloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import { v4 as uuidv4 } from "uuid";
 import JWT from "jsonwebtoken";
 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -51,11 +52,14 @@ export const registerUser = asyncHandler(async (req, res) => {
             throw new ApiError(400, "Avatar upload failed");
         }
 
+        const uniqueId = uuidv4();
+
         // Create user
         const user = await User.create({
             username: username.toLowerCase(),
             fullName,
             email,
+            uniqueId,
             password, // Make sure to hash the password in the User model
             avatar: avatar.secure_url,
             cloudinary_avatar_public_id: avatar?.public_id,
